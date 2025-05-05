@@ -1,8 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
 import PdfService, { ChunkSpanInfo } from '../services/pdf.service';
+import PdfHighlightLayer from '../components/PdfHighlightLayer';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+// Initialize the PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 // Note: In a real implementation, you would likely want to use a PDF viewer library
 // such as react-pdf, pdf.js or pdfjs-dist to render the PDF and handle highlighting.
@@ -26,6 +33,7 @@ const ViewerHeader = styled.div`
 const Title = styled.h1`
   color: #333;
   font-size: 1.5rem;
+  margin-top: 0.5rem;
 `;
 
 const PdfContainer = styled.div`
@@ -37,6 +45,36 @@ const PdfContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
+`;
+
+const DocumentContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+  position: relative;
+`;
+
+const StyledPage = styled(Page)`
+  canvas {
+    max-width: 100%;
+    height: auto !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .react-pdf__Page__textContent {
+    user-select: text;
+  }
+  
+  .react-pdf__Page__textContent > span[data-highlighted="true"] {
+    background-color: rgba(255, 235, 59, 0.5);
+    border-radius: 2px;
+  }
+  
+  .textLayer {
+    opacity: 1;
+  }
 `;
 
 const PdfLoadingMessage = styled.div`
@@ -80,6 +118,7 @@ const HighlightedTextContainer = styled.div`
   background-color: #fff3cd;
   border: 1px solid #ffeeba;
   border-radius: 4px;
+  margin-bottom: 1rem;
 `;
 
 const HighlightedTextTitle = styled.h3`
@@ -110,6 +149,13 @@ const BackToResultsLink = styled.a`
   }
 `;
 
+// Component for highlighted text (to replace mark)
+const HighlightedSpan = ({ children }: { children: string }) => (
+  <span style={{ backgroundColor: 'rgba(255, 235, 59, 0.5)', borderRadius: '2px', padding: '0' }}>
+    {children}
+  </span>
+);
+
 const PdfViewerPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -118,6 +164,7 @@ const PdfViewerPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [chunkInfo, setChunkInfo] = useState<ChunkSpanInfo | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const pdfContainerRef = useRef<HTMLDivElement>(null);
   
   // Get the parameters from the URL
   const filename = searchParams.get('file');
@@ -150,9 +197,10 @@ const PdfViewerPage: React.FC = () => {
           setChunkInfo(spanInfo);
         }
         
-        // In a real implementation, we would load the PDF here
+        // Prepare the PDF for highlighting (in a real implementation)
+        await PdfService.preparePdfForViewing(filename);
+        
         setPageNumber(page);
-        setTotalPages(20); // This would be determined from the actual PDF
         setLoading(false);
       } catch (err) {
         setError('Failed to load PDF. Please try again later.');
@@ -173,6 +221,11 @@ const PdfViewerPage: React.FC = () => {
     if (pageNumber < totalPages) {
       setPageNumber(pageNumber + 1);
     }
+  };
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setTotalPages(numPages);
+    setLoading(false);
   };
 
   return (
@@ -222,23 +275,30 @@ const PdfViewerPage: React.FC = () => {
           {loading ? (
             <PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>
           ) : (
-            <div>
-              {/* 
-                In a real implementation, this would be replaced with a PDF viewer component 
-                that renders the PDF and highlights the text.
-                For example:
-                <Document file={pdfUrl}>
-                  <Page pageNumber={pageNumber} highlight={chunkInfo} />
-                </Document>
-              */}
-              <p style={{ padding: '2rem', textAlign: 'center' }}>
-                This is a placeholder for the PDF viewer.<br /><br />
-                In a complete implementation, the PDF at {pdfUrl} would be displayed here with<br />
-                the text from chunk {chunkIndex} on page {page} highlighted.<br /><br />
-                You would need to integrate a PDF viewer library like react-pdf or pdf.js,<br />
-                and implement the highlighting logic based on the chunk boundaries.
-              </p>
-            </div>
+            <DocumentContainer ref={pdfContainerRef}>
+              {pdfUrl && (
+                <>
+                  <Document
+                    file={pdfUrl}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    loading={<PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>}
+                    error={<ErrorMessage>Failed to load PDF document</ErrorMessage>}
+                  >
+                    <StyledPage
+                      pageNumber={pageNumber}
+                      renderTextLayer={true}
+                      renderAnnotationLayer={true}
+                    />
+                  </Document>
+                  
+                  <PdfHighlightLayer 
+                    chunkInfo={chunkInfo}
+                    pdfContainerRef={pdfContainerRef}
+                    pageNumber={pageNumber}
+                  />
+                </>
+              )}
+            </DocumentContainer>
           )}
         </PdfContainer>
       </ViewerContainer>
