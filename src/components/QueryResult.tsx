@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { QueryResponse } from '../types/api';
+import EnhancedSourceViewer from './EnhancedSourceViewer';
 
 interface QueryResultProps {
   result: QueryResponse | null;
@@ -105,14 +106,18 @@ const QueryResult: React.FC<QueryResultProps> = ({ result, isLoading, isPolling 
           </AnswerContainer>
           
           {result.sources && result.sources.length > 0 && (
-            <SourcesContainer>
-              <strong>Sources:</strong>
-              <SourcesList>
-                {result.sources.map((source, index) => (
-                  <SourceItem key={index}>{source}</SourceItem>
-                ))}
-              </SourcesList>
-            </SourcesContainer>
+            <>
+              <SourcesContainer>
+                <strong>Sources:</strong>
+                <SourcesList>
+                  {result.sources.map((source, index) => (
+                    <SourceItem key={index}>{source}</SourceItem>
+                  ))}
+                </SourcesList>
+              </SourcesContainer>
+              
+              <EnhancedSourceViewer sources={result.sources} />
+            </>
           )}
         </>
       )}
