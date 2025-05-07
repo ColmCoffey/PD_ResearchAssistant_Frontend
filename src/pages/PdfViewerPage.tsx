@@ -228,6 +228,9 @@ const PdfViewerPage: React.FC = () => {
     setLoading(false);
   };
 
+  console.log('filename param:', filename);
+  console.log('PDF URL:', pdfUrl);
+
   return (
     <Layout>
       <ViewerContainer>
