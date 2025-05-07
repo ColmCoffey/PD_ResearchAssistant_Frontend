@@ -9,7 +9,9 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 // Initialize the PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = process.env.REACT_APP_PDF_JS_WORKER_URL;
+pdfjs.GlobalWorkerOptions.workerSrc =
+  process.env.REACT_APP_PDF_JS_WORKER_URL ||
+  "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
 
 // Note: In a real implementation, you would likely want to use a PDF viewer library
 // such as react-pdf, pdf.js or pdfjs-dist to render the PDF and handle highlighting.
