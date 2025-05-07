@@ -282,7 +282,7 @@ const PdfViewerPage: React.FC = () => {
               {pdfUrl && (
                 <>
                   <Document
-                    file={pdfUrl}
+                    file="https://turku-pd-literature.s3.eu-central-1.amazonaws.com/Jang%20et%20al._2023_Mass%20Spectrometry%E2%80%93Based%20Proteomics%20Analysis%20of_1.pdf"
                     onLoadSuccess={onDocumentLoadSuccess}
                     loading={<PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>}
                     error={<ErrorMessage>Failed to load PDF document</ErrorMessage>}
