@@ -25,6 +25,10 @@ export const getPdfUrl = (filename: string): string => {
     return 'https://arxiv.org/pdf/1708.08021.pdf';
   }
   
+  // If filename contains % (already encoded), don't encode again
+  if (filename.includes('%')) {
+    return `${PDF_BASE_URL}/${filename}`;
+  }
   return `${PDF_BASE_URL}/${encodeURIComponent(filename)}`;
 };
 
