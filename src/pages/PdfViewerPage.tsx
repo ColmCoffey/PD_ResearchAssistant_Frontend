@@ -9,7 +9,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 // Initialize the PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = process.env.REACT_APP_PDF_JS_WORKER_URL;
 
 // Note: In a real implementation, you would likely want to use a PDF viewer library
 // such as react-pdf, pdf.js or pdfjs-dist to render the PDF and handle highlighting.
@@ -282,7 +282,7 @@ const PdfViewerPage: React.FC = () => {
               {pdfUrl && (
                 <>
                   <Document
-                    file="https://turku-pd-literature.s3.eu-central-1.amazonaws.com/Jang%20et%20al._2023_Mass%20Spectrometry%E2%80%93Based%20Proteomics%20Analysis%20of_1.pdf"
+                    file={pdfUrl}
                     onLoadSuccess={onDocumentLoadSuccess}
                     loading={<PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>}
                     error={<ErrorMessage>Failed to load PDF document</ErrorMessage>}
