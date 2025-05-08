@@ -7,10 +7,9 @@ import PdfHighlightLayer from '../components/PdfHighlightLayer';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
-import workerSrc from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
-// Initialize the PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+// Initialize the PDF.js worker using the CDN URL for version 5.2.133
+pdfjs.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@5.2.133/build/pdf.worker.min.js";
 
 console.log('PDF.js workerSrc:', pdfjs.GlobalWorkerOptions.workerSrc);
 
