@@ -239,6 +239,7 @@ const PdfViewerPage: React.FC = () => {
 
   console.log('filename param:', filename);
   console.log('PDF URL:', pdfUrl);
+  console.log('typeof pdfUrl:', typeof pdfUrl, pdfUrl);
 
   return (
     <Layout>
@@ -308,6 +309,7 @@ const PdfViewerPage: React.FC = () => {
             </DocumentContainer>
           )}
         </PdfContainer>
+        {pdfUrl && <iframe src={pdfUrl} width="100%" height="600px" title="PDF Test" />}
       </ViewerContainer>
     </Layout>
   );
