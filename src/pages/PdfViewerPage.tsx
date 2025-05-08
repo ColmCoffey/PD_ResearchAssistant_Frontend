@@ -7,11 +7,12 @@ import PdfHighlightLayer from '../components/PdfHighlightLayer';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
+import workerSrc from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
 // Initialize the PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc =
-  process.env.REACT_APP_PDF_JS_WORKER_URL ||
-  "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
+pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+
+console.log('PDF.js workerSrc:', pdfjs.GlobalWorkerOptions.workerSrc);
 
 // Note: In a real implementation, you would likely want to use a PDF viewer library
 // such as react-pdf, pdf.js or pdfjs-dist to render the PDF and handle highlighting.
@@ -241,6 +242,8 @@ const PdfViewerPage: React.FC = () => {
   console.log('PDF URL:', pdfUrl);
   console.log('typeof pdfUrl:', typeof pdfUrl, pdfUrl);
 
+  console.log('Rendering <Document /> with file:', pdfUrl);
+
   return (
     <Layout>
       <ViewerContainer>
@@ -292,6 +295,7 @@ const PdfViewerPage: React.FC = () => {
               <Document
                 file={pdfUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
+                onLoadError={error => { console.error('PDF load error:', error); }}
                 loading={<PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>}
                 error={<ErrorMessage>Failed to load PDF document</ErrorMessage>}
               >
