@@ -277,32 +277,27 @@ const PdfViewerPage: React.FC = () => {
         )}
         
         <PdfContainer>
-          {loading ? (
+          {loading || !pdfUrl ? (
             <PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>
           ) : (
             <DocumentContainer ref={pdfContainerRef}>
-              {pdfUrl && (
-                <>
-                  <Document
-                    file={pdfUrl}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    loading={<PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>}
-                    error={<ErrorMessage>Failed to load PDF document</ErrorMessage>}
-                  >
-                    <StyledPage
-                      pageNumber={pageNumber}
-                      renderTextLayer={true}
-                      renderAnnotationLayer={true}
-                    />
-                  </Document>
-                  
-                  <PdfHighlightLayer 
-                    chunkInfo={chunkInfo}
-                    pdfContainerRef={pdfContainerRef}
-                    pageNumber={pageNumber}
-                  />
-                </>
-              )}
+              <Document
+                file={pdfUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                loading={<PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>}
+                error={<ErrorMessage>Failed to load PDF document</ErrorMessage>}
+              >
+                <StyledPage
+                  pageNumber={pageNumber}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                />
+              </Document>
+              <PdfHighlightLayer 
+                chunkInfo={chunkInfo}
+                pdfContainerRef={pdfContainerRef}
+                pageNumber={pageNumber}
+              />
             </DocumentContainer>
           )}
         </PdfContainer>
