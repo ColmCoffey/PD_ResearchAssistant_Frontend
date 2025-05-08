@@ -191,6 +191,12 @@ const PdfViewerPage: React.FC = () => {
       try {
         // Get PDF URL
         const url = PdfService.getPdfUrl(filename);
+
+        if (!url) {
+          setError('Failed to locate PDF file.');
+          setLoading(false);
+          return;
+        }
         setPdfUrl(url);
         
         // Get chunk information for highlighting

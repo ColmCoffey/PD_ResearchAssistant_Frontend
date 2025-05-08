@@ -15,8 +15,13 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:800
 
 /**
  * Get the URL to a PDF file based on its filename
+ * Returns null if the filename is invalid or empty.
  */
-export const getPdfUrl = (filename: string): string => {
+export const getPdfUrl = (filename: string): string | null => {
+  if (!filename || typeof filename !== 'string' || filename.trim() === '') {
+    console.warn('getPdfUrl: Invalid or empty filename provided:', filename);
+    return null;
+  }
   // For demonstration purposes, we're using a placeholder URL
   // In a real implementation, this would be an S3 URL or API endpoint to serve PDFs
   
@@ -26,10 +31,17 @@ export const getPdfUrl = (filename: string): string => {
   }
   
   // If filename contains % (already encoded), don't encode again
-  if (filename.includes('%')) {
-    return `${PDF_BASE_URL}/${filename}`;
+  try {
+    if (filename.includes('%')) {
+      return `${PDF_BASE_URL}/${filename}`;
+    }
+    // Basic sanitization: remove leading/trailing spaces
+    const safeFilename = filename.trim();
+    return `${PDF_BASE_URL}/${encodeURIComponent(safeFilename)}`;
+  } catch (e) {
+    console.error('getPdfUrl: Error encoding filename:', filename, e);
+    return null;
   }
-  return `${PDF_BASE_URL}/${encodeURIComponent(filename)}`;
 };
 
 /**
