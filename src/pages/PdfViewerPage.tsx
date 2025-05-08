@@ -159,6 +159,7 @@ const HighlightedSpan = ({ children }: { children: string }) => (
 );
 
 const PdfViewerPage: React.FC = () => {
+  console.log('REACT_APP_PDF_STORAGE_URL:', process.env.REACT_APP_PDF_STORAGE_URL);
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
