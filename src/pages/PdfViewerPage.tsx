@@ -9,7 +9,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 // Initialize the PDF.js worker using the CDN URL for version 5.2.133
-pdfjs.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@5.2.133/build/pdf.worker.min.js";
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
 
 console.log('PDF.js workerSrc:', pdfjs.GlobalWorkerOptions.workerSrc);
 
