@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PdfViewerPage from './pages/PdfViewerPage';
+import NewPdfViewerPage from './pages/NewPdfViewerPage';
+import AdvancedPdfViewerPage from './pages/AdvancedPdfViewerPage';
 import './App.css';
 
 // Configure Amplify - this will be updated with your actual configuration when deployed
@@ -25,7 +27,9 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/pdf-viewer" element={<PdfViewerPage />} />
+        <Route path="/pdf-viewer" element={<NewPdfViewerPage />} />
+        <Route path="/advanced-pdf-viewer" element={<AdvancedPdfViewerPage />} />
+        <Route path="/legacy-pdf-viewer" element={<PdfViewerPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>

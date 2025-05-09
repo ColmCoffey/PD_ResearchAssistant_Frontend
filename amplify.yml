@@ -14,6 +14,23 @@ frontend:
     baseDirectory: build
     files:
       - '**/*'
+  customHeaders:
+    - pattern: '**/*.pdf'
+      headers:
+        - key: 'Content-Type'
+          value: 'application/pdf'
+        - key: 'Content-Disposition'
+          value: 'inline'
+        - key: 'Cache-Control'
+          value: 'public, max-age=86400'
+        - key: 'Access-Control-Allow-Origin'
+          value: '*'
   cache:
     paths:
       - node_modules/**/*
+# Configure custom redirects and rewrites to ensure PDFs are served properly
+  redirects:
+    - source: '^[^.]+$|\.(?!(html|css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json|pdf)$)([^.]+$)'
+      target: '/index.html'
+      status: '200'
+      condition: null

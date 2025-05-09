@@ -1,17 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
 import PdfService, { ChunkSpanInfo } from '../services/pdf.service';
-import PdfHighlightLayer from '../components/PdfHighlightLayer';
-import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
-
-// Initialize the PDF.js worker using the CDN URL for version 5.2.133
-pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
-
-console.log('PDF.js workerSrc:', pdfjs.GlobalWorkerOptions.workerSrc);
 
 // Note: In a real implementation, you would likely want to use a PDF viewer library
 // such as react-pdf, pdf.js or pdfjs-dist to render the PDF and handle highlighting.
@@ -48,35 +39,6 @@ const PdfContainer = styled.div`
   align-items: center;
   justify-content: center;
   padding: 1rem;
-`;
-
-const DocumentContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  overflow: auto;
-  position: relative;
-`;
-
-const StyledPage = styled(Page)`
-  canvas {
-    max-width: 100%;
-    height: auto !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .react-pdf__Page__textContent {
-    user-select: text;
-  }
-  
-  .react-pdf__Page__textContent > span[data-highlighted="true"] {
-    background-color: rgba(255, 235, 59, 0.5);
-    border-radius: 2px;
-  }
-  
-  .textLayer {
-    opacity: 1;
-  }
 `;
 
 const PdfLoadingMessage = styled.div`
@@ -167,7 +129,6 @@ const PdfViewerPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [chunkInfo, setChunkInfo] = useState<ChunkSpanInfo | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const pdfContainerRef = useRef<HTMLDivElement>(null);
   
   // Get the parameters from the URL
   const filename = searchParams.get('file');
@@ -192,23 +153,19 @@ const PdfViewerPage: React.FC = () => {
       try {
         // Get PDF URL
         const url = PdfService.getPdfUrl(filename);
-
         if (!url) {
           setError('Failed to locate PDF file.');
           setLoading(false);
           return;
         }
         setPdfUrl(url);
-        
         // Get chunk information for highlighting
         const spanInfo = await PdfService.getChunkSpanInfo(filename, page, chunkIndex);
         if (spanInfo) {
           setChunkInfo(spanInfo);
         }
-        
         // Prepare the PDF for highlighting (in a real implementation)
         await PdfService.preparePdfForViewing(filename);
-        
         setPageNumber(page);
         setLoading(false);
       } catch (err) {
@@ -216,7 +173,6 @@ const PdfViewerPage: React.FC = () => {
         setLoading(false);
       }
     };
-    
     loadPdfData();
   }, [filename, page, chunkIndex]);
   
@@ -232,16 +188,9 @@ const PdfViewerPage: React.FC = () => {
     }
   };
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setTotalPages(numPages);
-    setLoading(false);
-  };
-
   console.log('filename param:', filename);
   console.log('PDF URL:', pdfUrl);
   console.log('typeof pdfUrl:', typeof pdfUrl, pdfUrl);
-
-  console.log('Rendering <Document /> with file:', pdfUrl);
 
   return (
     <Layout>
@@ -274,9 +223,7 @@ const PdfViewerPage: React.FC = () => {
             </NavigationButton>
           </div>
         </ViewerHeader>
-        
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        
         {chunkInfo && (
           <HighlightedTextContainer>
             <HighlightedTextTitle>Cited Text (Chunk {chunkIndex} on Page {page}):</HighlightedTextTitle>
@@ -285,34 +232,13 @@ const PdfViewerPage: React.FC = () => {
             </HighlightedText>
           </HighlightedTextContainer>
         )}
-        
         <PdfContainer>
           {loading || !pdfUrl ? (
             <PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>
           ) : (
-            <DocumentContainer ref={pdfContainerRef}>
-              <Document
-                file={pdfUrl}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={error => { console.error('PDF load error:', error); }}
-                loading={<PdfLoadingMessage>Loading PDF...</PdfLoadingMessage>}
-                error={<ErrorMessage>Failed to load PDF document</ErrorMessage>}
-              >
-                <StyledPage
-                  pageNumber={pageNumber}
-                  renderTextLayer={true}
-                  renderAnnotationLayer={true}
-                />
-              </Document>
-              <PdfHighlightLayer 
-                chunkInfo={chunkInfo}
-                pdfContainerRef={pdfContainerRef}
-                pageNumber={pageNumber}
-              />
-            </DocumentContainer>
+            <iframe src={pdfUrl} width="100%" height="800px" title="PDF Viewer" />
           )}
         </PdfContainer>
-        {pdfUrl && <iframe src={pdfUrl} width="100%" height="600px" title="PDF Test" />}
       </ViewerContainer>
     </Layout>
   );
