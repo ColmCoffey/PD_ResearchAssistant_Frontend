@@ -55,23 +55,6 @@ const QueryText = styled.p`
   color: #4285f4;
 `;
 
-const SourcesContainer = styled.div`
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e9ecef;
-`;
-
-const SourcesList = styled.ul`
-  padding-left: 1.5rem;
-  margin-top: 0.5rem;
-`;
-
-const SourceItem = styled.li`
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  color: #6c757d;
-`;
-
 const QueryResult: React.FC<QueryResultProps> = ({ result, isLoading, isPolling }) => {
   if (isLoading) {
     return (

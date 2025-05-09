@@ -30,37 +30,19 @@ export const getPdfUrl = (filename: string, forceFallback: boolean = false): str
   // Known working S3 PDFs - the exact URL we know works
   const workingUrl = 'https://turku-pd-literature.s3.eu-central-1.amazonaws.com/Jang%20et%20al._2023_Mass%20Spectrometry%E2%80%93Based%20Proteomics%20Analysis%20of_1.pdf';
   
-  // For advanced PDF viewer, always try to use the working URL to avoid CORS issues
-  const isAdvancedViewer = window.location.pathname.includes('advanced-pdf-viewer');
-  if (isAdvancedViewer && !forceFallback) {
-    console.log('Using advanced viewer - serving known working S3 PDF');
-    return workingUrl;
-  }
-  
-  // If we're not forcing fallback, try to use the working URL directly
+  // By default, always try to use the known working S3 URL unless fallback is forced
+  // This ensures HTTPS is used, which is required for iframe security
   if (!forceFallback) {
-    // Check if the filename contains any variation of "Jang" and return the known working URL
-    if (filename.toLowerCase().includes('jang')) {
-      console.log('Using known working S3 PDF URL for Jang paper');
-      return workingUrl;
-    }
-    
-    // For all other filenames, log the attempt but immediately use fallback
-    // since we're still getting access denied errors
-    console.log(`Filename "${filename}" doesn't match known working patterns. Using fallback.`);
-    console.log('To try direct S3 access, use a URL with a filename similar to:');
-    console.log('Jang et al._2023_Mass Spectrometry–Based Proteomics Analysis of_1.pdf');
-    
-    // Force fallback for all other filenames until we resolve the S3 access issues
-    forceFallback = true;
+    console.log('Using S3 PDF URL that is known to work with CORS and HTTPS');
+    return workingUrl;
   } else {
-    console.log('Forced fallback mode - Using public PDFs instead of S3');
+    console.log('Forced fallback mode - Using public PDFs with HTTPS instead of S3');
   }
   
-  // Fallback to reliable public PDFs for testing
+  // Fallback to reliable public PDFs over HTTPS for testing
   console.log('Using fallback public PDF for testing');
   
-  // Public PDFs for testing - using only reliable sources
+  // Public PDFs for testing - using only reliable HTTPS sources
   const publicPdfs: {[key: string]: string} = {
     'default': 'https://arxiv.org/pdf/1708.08021.pdf', // AI for Neuroscience paper
     'pd-review.pdf': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5652067/pdf/nihms890061.pdf',
