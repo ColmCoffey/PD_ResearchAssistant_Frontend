@@ -81,9 +81,8 @@ const parseSourceId = (source: string): ParsedSource | null => {
 
 // Generate a URL to view the PDF with the relevant part highlighted
 const generatePdfViewerUrl = (parsedSource: ParsedSource): string => {
-  // In a real implementation, this would point to your PDF viewer endpoint
-  // The base URL would be configured based on your deployment environment
-  const baseUrl = process.env.REACT_APP_PDF_VIEWER_URL || '/pdf-viewer';
+  // Always use the simple PDF viewer path, as it's more reliable than the advanced viewer
+  const baseUrl = '/pdf-viewer';
   
   return `${baseUrl}?file=${encodeURIComponent(parsedSource.filename)}&page=${parsedSource.page}&chunk=${parsedSource.chunkIndex}`;
 };
